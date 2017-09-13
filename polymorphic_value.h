@@ -111,10 +111,42 @@ namespace jbcoe
         return std::make_unique<pointer_control_block>(
             C::operator()(*p_), static_cast<const C&>(*this), p_.get_deleter());
       }
-
+      
       T* ptr() override
       {
         return p_.get();
+      }
+    };
+
+    template <class T, class P, class C, class D>
+    class fancy_pointer_control_block : public control_block<T>
+    {
+      // FIXME: I suspect one can use unique_ptr and allocator traits to do
+      // this more concisely.
+      P p_;
+      C c_;
+      D d_;
+
+    public:
+      fancy_pointer_control_block(P p, C c = C{}, D d = D{})
+          : p_(p), c_(std::move(c)), d_(std::move(d))
+      {
+      }
+
+      std::unique_ptr<control_block<T>> clone() const override
+      {
+        assert(p_);
+        return std::make_unique<fancy_pointer_control_block>(c_(p_), c_, d_);
+      }
+      
+      T* ptr() override
+      {
+        assert(p_);
+        return p_.operator->();
+      }
+
+      ~fancy_pointer_control_block() {
+        d_(p_);
       }
     };
 
@@ -206,6 +238,26 @@ namespace jbcoe
       cb_ = std::make_unique<detail::pointer_control_block<T, U, C, D>>(
           std::move(p), std::move(copier));
       ptr_ = u;
+    }
+
+    template <class U, class C, class D,
+              class = std::enable_if_t<std::is_convertible<
+                  decltype(std::declval<U&>().operator->()), T*>::value>>
+    explicit polymorphic_value(U u, C copier, D deleter)
+    {
+      if (!u)
+      {
+        return;
+      }
+
+      // require that the following are well-formed:
+      // bool(u)
+      // deleter(u)
+      // copier(*u) -> U
+
+      cb_ = std::make_unique<detail::fancy_pointer_control_block<T, U, C, D>>(
+          std::move(u), std::move(copier), std::move(deleter));
+      ptr_ = u.operator->();
     }
 
 

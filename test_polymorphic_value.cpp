@@ -786,3 +786,48 @@ TEST_CASE("polymorphic_value<const T>", "[polymorphic_value.compatible_types]")
   // p->set_value(42);
 }
 
+template <class T>
+class handle_t {
+  T* p_;
+
+public:
+  handle_t(T* p) : p_(p) {}
+  
+  operator bool() const { return bool(p_); }
+  
+  const T* operator*() const
+  {
+    return bool(p_);
+  }
+
+  T& operator*()
+  {
+    return *p_;
+  }
+  
+  T* operator->()
+  {
+    return p_;
+  }
+
+  static handle_t copy(const handle_t& h)
+  {
+    return handle_t(new T(*h.p_));
+  }
+
+  static void dispose(handle_t& h)
+  {
+    delete h.p_;
+  }
+};
+
+TEST_CASE("polymorphic_value, construction from a fancy-pointer", "[polymorphic_value.constructors]")
+{
+  handle_t<DerivedType> h(new DerivedType(7));
+
+  polymorphic_value<DerivedType> pv(h, &handle_t<DerivedType>::copy, &handle_t<DerivedType>::dispose);
+
+  auto pv2 = pv;
+
+ REQUIRE(pv.operator->() != pv2.operator->());
+}
