@@ -28,11 +28,11 @@
 
 namespace boost {
 
-  namespace detail {
+  ////////////////////////////////////////////////////////////////////////////
+  // Implementation detail classes
+  ////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Implementation detail classes
-    ////////////////////////////////////////////////////////////////////////////
+  namespace detail {
 
     template <class T>
     struct default_copy {
@@ -146,6 +146,7 @@ namespace boost {
     std::unique_ptr<detail::control_block<T>> cb_;
 
   public:
+    
     //
     // Destructor
     //
@@ -203,7 +204,6 @@ namespace boost {
           std::move(tmp.cb_));
     }
 
-
     //
     // Move-constructors
     //
@@ -238,7 +238,6 @@ namespace boost {
       ptr_ = cb_->ptr();
     }
 
-
     //
     // Assignment
     //
@@ -268,7 +267,6 @@ namespace boost {
       *this = std::move(tmp);
       return *this;
     }
-
 
     //
     // Move-assignment
@@ -309,7 +307,6 @@ namespace boost {
       return *this;
     }
 
-
     //
     // Modifiers
     //
@@ -319,7 +316,6 @@ namespace boost {
       swap(ptr_, p.ptr_);
       swap(cb_, p.cb_);
     }
-
 
     //
     // Observers
@@ -361,6 +357,7 @@ namespace boost {
   //
   // polymorphic_value creation
   //
+  
   template <class T, class... Ts>
   polymorphic_value<T> make_polymorphic_value(Ts&&... ts) {
     polymorphic_value<T> p;
@@ -373,6 +370,7 @@ namespace boost {
   //
   // non-member swap
   //
+
   template <class T>
   void swap(polymorphic_value<T>& t, polymorphic_value<T>& u) noexcept {
     t.swap(u);
