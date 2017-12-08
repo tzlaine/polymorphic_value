@@ -1,0 +1,82 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Introduction</title>
+<link rel="stylesheet" href="../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.PolymorphicValue (Proposed)">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.PolymorphicValue (Proposed)">
+<link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.PolymorphicValue (Proposed)">
+<link rel="next" href="tutorial.html" title="Tutorial">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_polymorphicvalue__proposed_.introduction"></a><a class="link" href="introduction.html" title="Introduction">Introduction</a>
+</h2></div></div></div>
+<p>
+      Class template <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>
+      represents a polymorphic object with value-semantics.
+    </p>
+<h4>
+<a name="boost_polymorphicvalue__proposed_.introduction.h0"></a>
+      <span class="phrase"><a name="boost_polymorphicvalue__proposed_.introduction.problem"></a></span><a class="link" href="introduction.html#boost_polymorphicvalue__proposed_.introduction.problem">Problem</a>
+    </h4>
+<p>
+      Suppose we want to design a class in terms of polymorphic components and have
+      the compiler correctly generate the special member functions: destructor, copy
+      constructor, copy assignment operator, move constructor and move assignment
+      operator.
+    </p>
+<h4>
+<a name="boost_polymorphicvalue__proposed_.introduction.h1"></a>
+      <span class="phrase"><a name="boost_polymorphicvalue__proposed_.introduction.solution"></a></span><a class="link" href="introduction.html#boost_polymorphicvalue__proposed_.introduction.solution">Solution</a>
+    </h4>
+<p>
+      This is how one would write a class made of polymorphic components using <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>:
+    </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">polymorphic_value</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">vector</span><span class="special">&gt;</span>
+
+<span class="keyword">class</span> <span class="identifier">Zoo</span> <span class="special">{</span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Animal</span><span class="special">&gt;&gt;</span> <span class="identifier">animals_</span><span class="special">;</span>
+ <span class="keyword">public</span><span class="special">:</span>
+  <span class="identifier">Zoo</span><span class="special">()</span> <span class="special">=</span> <span class="keyword">default</span><span class="special">;</span>
+  <span class="identifier">Zoo</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Animal</span><span class="special">&gt;&gt;</span> <span class="identifier">animals</span><span class="special">)</span> <span class="special">:</span>
+      <span class="identifier">animals_</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">animals</span><span class="special">))</span> <span class="special">{}</span>
+
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">size</span><span class="special">()</span> <span class="keyword">const</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">animals_</span><span class="special">.</span><span class="identifier">size</span><span class="special">();</span>
+  <span class="special">}</span>
+
+  <span class="keyword">const</span> <span class="identifier">Animal</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">i</span><span class="special">)</span> <span class="keyword">const</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="special">*</span><span class="identifier">animals_</span><span class="special">[</span><span class="identifier">i</span><span class="special">];</span>
+  <span class="special">}</span>
+
+  <span class="identifier">Animal</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">[](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">i</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">return</span> <span class="special">*</span><span class="identifier">animals_</span><span class="special">[</span><span class="identifier">i</span><span class="special">];</span>
+  <span class="special">}</span>
+
+  <span class="keyword">void</span> <span class="identifier">AddAnimal</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Animal</span><span class="special">&gt;</span> <span class="identifier">animal</span><span class="special">)</span> <span class="special">{</span>
+    <span class="identifier">animals_</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">animal</span><span class="special">));</span>
+  <span class="special">}</span>
+<span class="special">}</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2017 Jonathan Coe<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tutorial.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Design Overview</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.PolymorphicValue (Proposed)">
+<link rel="up" href="../tutorial.html" title="Tutorial">
+<link rel="prev" href="motivation.html" title="Motivation">
+<link rel="next" href="when_to_use__polymorphic_value_.html" title="When to use polymorphic_value">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="motivation.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tutorial.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="when_to_use__polymorphic_value_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_polymorphicvalue__proposed_.tutorial.design_overview"></a><a class="link" href="design_overview.html" title="Design Overview">Design
+      Overview</a>
+</h3></div></div></div>
+<p>
+        A <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> member
+        can be used with the same syntax one would use for a pointer member: <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;</span></code>
+        and <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
+        will respectively return a pointer and a reference. Like a pointer, <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> can be null so should
+        probably be initialised within the parent object constructor.
+      </p>
+<p>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> has value
+        semantics: when copied, it will perform a deep copy of the owned object,
+        and it propagates <code class="computeroutput"><span class="keyword">const</span></code> to the
+        owned object.
+      </p>
+<h5>
+<a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.h0"></a>
+        <span class="phrase"><a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.deep_copies"></a></span><a class="link" href="design_overview.html#boost_polymorphicvalue__proposed_.tutorial.design_overview.deep_copies">Deep
+        copies</a>
+      </h5>
+<p>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> enables
+        deep-copies through inheritance heirarchies: a <code class="computeroutput"><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Shape</span><span class="special">&gt;</span></code> initialized with a <code class="computeroutput"><span class="identifier">Circle</span></code>
+        object will produce a <code class="computeroutput"><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Shape</span><span class="special">&gt;</span></code> managing a copy of the <code class="computeroutput"><span class="identifier">Circle</span></code> object produced using <code class="computeroutput"><span class="identifier">Circle</span></code>'s copy constructor.
+      </p>
+<p>
+        Virtual destructors can be used to ensure that a derived class object is
+        correctly destroyed through a base class pointer. C++ offers no equivalent
+        of virtual destructors for copy construction; <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>
+        uses type-erasure to store type information about the managed object and
+        call the copy constructor when required. Note that virtual destructors are
+        not needed for <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>
+        as the type-erasure mechanism used to produce copies is also used to call
+        the correct derived class destructor.
+      </p>
+<h5>
+<a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.h1"></a>
+        <span class="phrase"><a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.const_propagation"></a></span><a class="link" href="design_overview.html#boost_polymorphicvalue__proposed_.tutorial.design_overview.const_propagation">Const-propagation</a>
+      </h5>
+<p>
+        As <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> is intended
+        to be used to model a value-type, a <code class="computeroutput"><span class="keyword">const</span></code>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code> will
+        only give access to a <code class="computeroutput"><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span></code>
+        and <code class="computeroutput"><span class="keyword">const</span> <span class="identifier">T</span><span class="special">*</span></code>. For non-<code class="computeroutput"><span class="keyword">const</span></code>
+        access, a non-<code class="computeroutput"><span class="keyword">const</span></code> <code class="computeroutput"><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code> is
+        needed.
+      </p>
+<p>
+        For design of component-based objects, const-propagation is required as no
+        part of a contextually immutable object should be mutable. Where access to
+        a mutable <code class="computeroutput"><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code>
+        is truly required from a <code class="computeroutput"><span class="keyword">const</span></code>
+        access path, a <code class="computeroutput"><span class="keyword">mutable</span> <span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code>
+        member can be used (this should be rare).
+      </p>
+<h5>
+<a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.h2"></a>
+        <span class="phrase"><a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.default_construction_and_a_null_state"></a></span><a class="link" href="design_overview.html#boost_polymorphicvalue__proposed_.tutorial.design_overview.default_construction_and_a_null_state">Default
+        construction and a null state</a>
+      </h5>
+<p>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> is intended
+        to be used with Standard Library collections which requires that it is default
+        constructible. As <code class="computeroutput"><span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code>
+        can be instantiated for an abstract class <code class="computeroutput"><span class="identifier">T</span></code>,
+        the default constructor cannot, in general, default construct the managed
+        object. There may also be cases where default construction of the managed
+        object would be undesirably expensive in terms of memory or speed.
+      </p>
+<p>
+        The default constructor puts <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>
+        in an empty state where no object is managed. Both <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;</span></code> and <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> have preconditions where calling them on
+        an empty <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>
+        is prohibited. An <code class="computeroutput"><span class="keyword">explicit</span></code>
+        <code class="computeroutput"><span class="keyword">operator</span> <span class="keyword">bool</span></code>
+        is provided to allow idiomatic checking for a null state.
+      </p>
+<h5>
+<a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.h3"></a>
+        <span class="phrase"><a name="boost_polymorphicvalue__proposed_.tutorial.design_overview.reference_stability"></a></span><a class="link" href="design_overview.html#boost_polymorphicvalue__proposed_.tutorial.design_overview.reference_stability">Reference
+        stability</a>
+      </h5>
+<p>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> makes no
+        guarantees of the stability of pointers and references obtained from <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;</span></code>
+        and <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>.
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> models
+        a value-type like optional or variant and may make use of a small object
+        optimization to avoid heap allocation for small objects. Such an optimisation
+        would render pointers and references to a managed object invalid after a
+        move operation. The result of <code class="computeroutput"><span class="keyword">operator</span><span class="special">-&gt;</span></code> and <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> should be used directly, not cached for
+        later use.
+      </p>
+<pre class="programlisting"><span class="comment">// recommended use</span>
+<span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Shape</span><span class="special">&gt;</span> <span class="identifier">pv</span><span class="special">(</span><span class="identifier">Circle</span><span class="special">(</span><span class="number">8</span><span class="special">));</span>
+<span class="identifier">foo</span><span class="special">(*</span><span class="identifier">pv</span><span class="special">);</span>
+<span class="keyword">double</span> <span class="identifier">area</span> <span class="special">=</span> <span class="identifier">pv</span><span class="special">-&gt;</span><span class="identifier">Area</span><span class="special">();</span>
+
+<span class="comment">// mis-use (pointer stability not guaranteed)</span>
+<span class="identifier">polymorphic_value</span><span class="special">&lt;</span><span class="identifier">Shape</span><span class="special">&gt;</span> <span class="identifier">pv</span><span class="special">(</span><span class="identifier">Circle</span><span class="special">(</span><span class="number">8</span><span class="special">));</span>
+<span class="identifier">Shape</span><span class="special">*</span> <span class="identifier">s</span> <span class="special">=</span> <span class="identifier">pv</span><span class="special">.</span><span class="keyword">operator</span><span class="special">-&gt;();</span>
+<span class="identifier">foo</span><span class="special">(*</span><span class="identifier">pv</span><span class="special">);</span>
+<span class="keyword">double</span> <span class="identifier">area</span> <span class="special">=</span> <span class="identifier">s</span><span class="special">-&gt;</span><span class="identifier">Area</span><span class="special">();</span>
+</pre>
+<p>
+        The unnatural looking code that one is required to write to cache a pointer
+        to a <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>'s
+        managed object should be a suitable deterrent.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2017 Jonathan Coe<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="motivation.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tutorial.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="when_to_use__polymorphic_value_.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

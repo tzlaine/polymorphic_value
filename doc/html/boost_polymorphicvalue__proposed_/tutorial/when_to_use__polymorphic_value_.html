@@ -1,0 +1,64 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>When to use polymorphic_value</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.PolymorphicValue (Proposed)">
+<link rel="up" href="../tutorial.html" title="Tutorial">
+<link rel="prev" href="design_overview.html" title="Design Overview">
+<link rel="next" href="custom_copiers_and_deleters.html" title="Custom copiers and deleters">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="design_overview.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tutorial.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="custom_copiers_and_deleters.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_polymorphicvalue__proposed_.tutorial.when_to_use__polymorphic_value_"></a><a class="link" href="when_to_use__polymorphic_value_.html" title="When to use polymorphic_value">When
+      to use <code class="computeroutput"><span class="identifier">polymorphic_value</span></code></a>
+</h3></div></div></div>
+<p>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> is designed
+        to be used in polymorphic component-based designs where the set of possible
+        component types is open to extension (open-set polymorphism).
+      </p>
+<p>
+        <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> introduces
+        a virtual function call into copy construction and memory indirection into
+        member function invocation. C++ advocates only paying for what you use so
+        we would advocate avoiding the unnecessary use of <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>.
+      </p>
+<p>
+        If a component design does not require polymorphic components then storing
+        components by value may be a better choice than using <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>.
+      </p>
+<p>
+        If a component design does not require mutable components then storing components
+        by <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">shared_ptr</span><span class="special">&lt;</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&gt;</span></code> may be a better choice than using <code class="computeroutput"><span class="identifier">polymorphic_value</span></code> (Note the <code class="computeroutput"><span class="keyword">const</span></code>).
+      </p>
+<p>
+        If a component design has component sub-types chosen from a know set of sub-types,
+        then an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">variant</span><span class="special">&lt;</span><span class="identifier">A</span><span class="special">,</span><span class="identifier">B</span><span class="special">,</span><span class="identifier">C</span><span class="special">&gt;</span></code>
+        may be a better choice than using <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>.
+      </p>
+<p>
+        If a component design requires an open or extensible set of component sub-types,
+        and mutability of components then <code class="computeroutput"><span class="identifier">polymorphic_value</span></code>
+        may be a good choice.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2017 Jonathan Coe<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="design_overview.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tutorial.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="custom_copiers_and_deleters.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
